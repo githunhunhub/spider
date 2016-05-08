@@ -2,6 +2,8 @@
 
 from urllib import request
 import os
+import shutil
+
 
 def url_open(page_url):
     req = request.Request(page_url, headers={
@@ -15,29 +17,40 @@ def url_open(page_url):
     html = resp.read()
     return html
 
+
 def find_img_url(page_url):
     html = url_open(page_url).decode('utf-8')
     img_addrs = []
     # 查找关键词“img src”，并从后边提取图片网址
     a = html.find('img src')
     while a != -1:
-        #print('a')
+        # print('a')
         b = html.find('.jpg', a, a+100)
         if b != -1:
-            #print('b')
+            # print('b')
             img_addrs.append(html[a+9:b+4])
         else:
             b = a+9
         a = html.find('img src', b)
+    '''
     for i in img_addrs:
         print(i)
-
+    '''
     return img_addrs
 
-def save_img(img_url):
-    os.mkdir('acfun')
-    os.chdir('acfun')
 
+def save_img(img_url):
+    if os.path.exists('acfun'):
+        shutil.rmtree('acfun')
+        print('Delete acfun and creat new file')
+        os.mkdir('acfun')
+        os.chdir('acfun')
+    else:
+        print('Create new file')
+        os.mkdir('acfun')
+        os.chdir('acfun')
+
+    print("Begin to download IMG ")
     for i in img_url:
         filename = i.split('/')[-1]
         with open(filename, 'wb') as f:
